@@ -95,6 +95,8 @@ RUN mkdir -p "$CODE_ROOT" "$ONETIME_HOME"
 
 WORKDIR $CODE_ROOT
 
+RUN gem update --system 3.2.3
+
 # Run bundler again so that new dependencies added to the
 # Gemfile are installed at run time (i.e. avoiding a build)
 RUN bundle install
