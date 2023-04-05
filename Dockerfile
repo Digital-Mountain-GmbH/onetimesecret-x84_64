@@ -110,6 +110,7 @@ RUN bundle install
 FROM ruby:2.6-buster
 
 WORKDIR /usr/src/app
+RUN gem install bundler:2.3.17
 COPY Gemfile ./
 
 RUN bundle install
