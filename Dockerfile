@@ -115,7 +115,7 @@ COPY Gemfile ./
 
 RUN bundle install
 COPY . .
-RUN mv .env.empty .env
+# RUN mv .env.empty .env
 
 #
 # NOTE: see docker-compose.yaml for this container,
