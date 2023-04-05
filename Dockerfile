@@ -72,10 +72,10 @@ RUN set -eux && \
 
 COPY Gemfile ./
 
-RUN gem update --system 3.2.3:2.3.17
+RUN gem update --system 3.2.3
 
 # Run the most recent version of bundler to avoid complaints
-RUN gem install bundler
+gem install bundler:2.3.17
 
 # Install the dependencies into the base image
 RUN bundle install
