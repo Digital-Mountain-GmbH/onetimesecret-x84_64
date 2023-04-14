@@ -77,6 +77,11 @@ RUN gem update --system 3.2.3
 # Run the most recent version of bundler to avoid complaints
 RUN gem install bundler:2.3.17
 
+RUN gem install bundler:2.3.17
+RUN bundle lock --add-platform x86_64-linux
+RUN bundle config set --local frozen 'true'
+RUN bundle config set --local deployment 'true'
+RUN bundle config set --local without 'dev'
 # Install the dependencies into the base image
 RUN bundle install
 
