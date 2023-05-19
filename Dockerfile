@@ -70,7 +70,8 @@ RUN set -eux && \
     apt-get install -y $PACKAGES && \
     apt-get install -y $ADDITIONAL_PACKAGES
 
-COPY Gemfile ./
+RUN gem update --system
+RUN gem install bundler
 
 RUN gem update --system 3.2.3
 
@@ -96,31 +97,38 @@ ARG ONETIME_HOME
 
 LABEL Name=onetimesecret Version=0.11.0
 
+# Limit to packages necessary for onetime and operational tasks
+ARG PACKAGES="curl netcat vim-tiny less redis-tools iproute2 iputils-ping iftop pktstat pcp iptraf"
+
+# Fast fail on errors while installing system packages
+RUN set -eux && \
+    apt-get update && \
+    apt-get install -y $PACKAGES
+
 # Create the directories that we need in the following image
 RUN echo "Creating directories"
-RUN mkdir -p "$CODE_ROOT" "$ONETIME_HOME"
+RUN mkdir -p "$CODE_ROOT"
+RUN mkdir -p "$ONETIME_HOME/{log,tmp}"
 
 WORKDIR $CODE_ROOT
 
+COPY Gemfile ./
 
-# Run bundler again so that new dependencies added to the
-# Gemfile are installed at run time (i.e. avoiding a build)
+# Install the dependencies into the base image
 RUN bundle install
+RUN bundle update --bundler
+
 
 # Include the entire context with the image. This is how
 # the container runs in production. In development, if
 # the docker-compose also mounts a volume to the same
 # location the volume is what is available inside of
 # the container once it's up and running.
-FROM ruby:2.6-buster
+FROM container
 
-WORKDIR /usr/src/app
-RUN gem install bundler:2.3.17
-COPY Gemfile ./
+WORKDIR $CODE_ROOT
 
-RUN bundle install
 COPY . .
-# RUN mv .env.empty .env
 
 #
 # NOTE: see docker-compose.yaml for this container,
