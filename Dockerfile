@@ -72,9 +72,16 @@ RUN set -eux && \
 
 COPY Gemfile ./
 
-# Run the most recent version of bundler to avoid complaints
-RUN gem install bundler
+RUN gem update --system 3.2.3
 
+# Run the most recent version of bundler to avoid complaints
+RUN gem install bundler:2.3.17
+
+RUN gem install bundler:2.3.17
+RUN bundle lock --add-platform x86_64-linux
+RUN bundle config set --local frozen 'true'
+RUN bundle config set --local deployment 'true'
+RUN bundle config set --local without 'dev'
 # Install the dependencies into the base image
 RUN bundle install
 
@@ -95,6 +102,7 @@ RUN mkdir -p "$CODE_ROOT" "$ONETIME_HOME"
 
 WORKDIR $CODE_ROOT
 
+
 # Run bundler again so that new dependencies added to the
 # Gemfile are installed at run time (i.e. avoiding a build)
 RUN bundle install
@@ -107,11 +115,12 @@ RUN bundle install
 FROM ruby:2.6-buster
 
 WORKDIR /usr/src/app
+RUN gem install bundler:2.3.17
 COPY Gemfile ./
 
 RUN bundle install
 COPY . .
-RUN mv .env.empty .env
+# RUN mv .env.empty .env
 
 #
 # NOTE: see docker-compose.yaml for this container,
